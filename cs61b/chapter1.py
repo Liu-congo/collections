@@ -149,3 +149,29 @@ def fib(n: int) -> int:
         fib_list.append(fib_list[-1] + fib_list[-2])
     return fib_list[n-1]
 print(fib(5))
+
+# python class static VS. nonstatic method
+class Dog:
+    weightInPounds = -1
+    def __init__(self, weightInPounds):
+        Dog.weightInPounds = weightInPounds
+        pass
+
+    def make_noise(self):
+        print("bark!")
+    
+    @staticmethod
+    def make_noise_static():
+        print("bark!")
+
+    @classmethod
+    def weight_count(cls):
+        print(cls.weightInPounds)
+
+try:
+    Dog.make_noise()
+except Exception as e:
+    print(e)
+    
+Dog.make_noise_static()
+Dog(11).weight_count()
