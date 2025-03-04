@@ -6,48 +6,48 @@ print(x)
 print(y)
 
 # Textbook 2 IntList
-class IntList:
-    def __init__(self, cur:int, rest=None):
-        self.cur = cur
-        self.rest = rest
+# class IntList:
+#     def __init__(self, cur:int, rest=None):
+#         self.cur = cur
+#         self.rest = rest
 
-    def __repr__(self):
-        return f"IntList({self.cur}, {self.rest})"
+#     def __repr__(self):
+#         return f"IntList({self.cur}, {self.rest})"
     
-    def size(self):
-        if self.rest == None:
-            return 1
-        else:
-            return 1 + self.rest.size()
+#     def size(self):
+#         if self.rest == None:
+#             return 1
+#         else:
+#             return 1 + self.rest.size()
         
-    def iterativeSize(self):
-        total_size = 0
-        tmp = self
-        while tmp != None:
-            total_size += 1
-            tmp = tmp.rest
-        return total_size
+#     def iterativeSize(self):
+#         total_size = 0
+#         tmp = self
+#         while tmp != None:
+#             total_size += 1
+#             tmp = tmp.rest
+#         return total_size
 
-    def get(self, n):
-        idx = 0
-        tmp = self
-        while idx != n:
-            idx += 1
-            try:
-                tmp = tmp.rest
-            except Exception as e:
-                print(e)
-                return
-        assert tmp != None, "n out of List range"
-        return tmp.cur
+#     def get(self, n):
+#         idx = 0
+#         tmp = self
+#         while idx != n:
+#             idx += 1
+#             try:
+#                 tmp = tmp.rest
+#             except Exception as e:
+#                 print(e)
+#                 return
+#         assert tmp != None, "n out of List range"
+#         return tmp.cur
     
-L = IntList(5, None)
-L.rest = IntList(10, None)
-L.rest.rest = IntList(15, None)
-print(L)
-print(L.size())
-print(L.iterativeSize())
-print(L.get(2))
+# L = IntList(5, None)
+# L.rest = IntList(10, None)
+# L.rest.rest = IntList(15, None)
+# print(L)
+# print(L.size())
+# print(L.iterativeSize())
+# print(L.get(2))
 
 # Lab2
 class IntList:
@@ -119,7 +119,7 @@ class IntList:
         return outputIntList
     
     @staticmethod
-    def dcatenate(A: IntList, B: IntList):
+    def dcatenate(A, B):
         tmp = A
         while tmp.rest != None:
             tmp = tmp.rest
@@ -127,7 +127,7 @@ class IntList:
         return
     
     @staticmethod
-    def catenate(A: IntList, B: IntList):
+    def catenate(A, B):
         import copy
         outputIntList = copy.deepcopy(A)
         tmp = outputIntList
@@ -136,6 +136,12 @@ class IntList:
         tmp.rest = B
         return outputIntList
     
+    def addFirst(self, x:int):
+        import copy
+        tmp = copy.deepcopy(self)
+        self.cur = x
+        self.rest = tmp
+        return 
 
 L = IntList.of(1,2,3,4,5)
 print(L)
@@ -152,3 +158,78 @@ print(L)
 L3 = IntList.catenate(L, L1)
 print(L)
 print(L3)
+L = IntList.of(1,2,3,4,5)
+L.addFirst(10086)
+print(L)
+
+# SLLists
+class SLList:
+    __slots__ = ['__first', '__size']
+
+    class __IntNode:
+        def __init__(self, i:int, n):
+            self.item = i
+            self.next = n
+        
+        def __repr__(self):
+            if self.next == None:
+                return f"{self.item}"
+            return f"{self.item}, {self.next}"
+        
+        def size(self):
+            if self.next == None:
+                return 1
+            else:
+                return 1 + self.next.size()
+        
+    def __init__(self):
+        self.__first = None
+        self.__size = 0
+
+    def addFirst(self, x:int):
+        self.__first = self.__IntNode(x, self.__first)
+        self.__size += 1
+
+    def getFirst(self):
+        return self.__first.item
+
+    def addLast(self, x:int):
+        tmp = SLList()
+        if self.__first == None:
+            self.__first = self.__IntNode(x, None)
+        tmp.__first = self.__first.next
+        if tmp.__first == None:
+            tmp.__first = self.__IntNode(x, None)
+        else:
+            tmp.addLast(x)
+
+        self.__first.next = tmp.__first
+        self.__size += 1
+
+    
+    def size(self):
+        return self.__size
+    
+    def __repr__(self):
+        return f"[{self.__first}]"
+    
+
+L2 = SLList()
+L2.addFirst(10)
+L2.addFirst(5)
+L2.addFirst(5)
+L2.addFirst(5)
+L2.addFirst(5)
+print(L2.size())
+x = L2.getFirst()
+print(x)
+print(L2)
+L2 = SLList()
+L2.addLast(10086)
+L2.addLast(10086)
+L2.addLast(10086)
+L2.addLast(10086)
+L2.addLast(10086)
+print(L2)
+print(L2.size())
+        
