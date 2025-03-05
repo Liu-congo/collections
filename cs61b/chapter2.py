@@ -164,7 +164,7 @@ print(L)
 
 # SLLists
 class SLList:
-    __slots__ = ['__first', '__size']
+    __slots__ = ['__first', '__size','__last']
 
     class __IntNode:
         def __init__(self, i:int, n):
@@ -176,34 +176,43 @@ class SLList:
                 return f"{self.item}"
             return f"{self.item}, {self.next}"
         
-        def size(self):
-            if self.next == None:
-                return 1
-            else:
-                return 1 + self.next.size()
-        
     def __init__(self):
-        self.__first = None
+        self.__first = self.__IntNode(None, None)
+        self.__last = self.__first
         self.__size = 0
 
     def addFirst(self, x:int):
-        self.__first = self.__IntNode(x, self.__first)
+        self.__first.next = self.__IntNode(x, self.__first.next)
         self.__size += 1
 
     def getFirst(self):
-        return self.__first.item
+        return self.__first.next.item
 
+    # def addLastRecursive(self, x:int):
+    #     tmp = SLList()
+    #     if self.__first == None:
+    #         self.__first = self.__IntNode(x, None)
+    #     tmp.__first = self.__first.next
+    #     if tmp.__first == None:
+    #         tmp.__first = self.__IntNode(x, None)
+    #     else:
+    #         tmp.addLast(x)
+
+    #     self.__first.next = tmp.__first
+    #     self.__size += 1
+
+    # TODO fix the addLast, reference pass / value pass
     def addLast(self, x:int):
-        tmp = SLList()
-        if self.__first == None:
-            self.__first = self.__IntNode(x, None)
-        tmp.__first = self.__first.next
-        if tmp.__first == None:
-            tmp.__first = self.__IntNode(x, None)
-        else:
-            tmp.addLast(x)
-
-        self.__first.next = tmp.__first
+        if self.__first.next == None:
+            self.__first.next = self.__IntNode(x, None)
+            self.__size += 1
+            return
+        tmp = self.__first
+        while tmp.next != None:
+            tmp = tmp.next
+        tmp.next = self.__IntNode(x, None)
+        # self.__last.next = self.__IntNode(x, self.__last.next)
+        # self.__last = self.__last.next
         self.__size += 1
 
     
@@ -211,25 +220,72 @@ class SLList:
         return self.__size
     
     def __repr__(self):
-        return f"[{self.__first}]"
+        return f"[{self.__first.next}]"
     
 
 L2 = SLList()
 L2.addFirst(10)
 L2.addFirst(5)
+L2.addLast(10086)
 L2.addFirst(5)
 L2.addFirst(5)
 L2.addFirst(5)
-print(L2.size())
 x = L2.getFirst()
 print(x)
 print(L2)
 L2 = SLList()
 L2.addLast(10086)
 L2.addLast(10086)
-L2.addLast(10086)
-L2.addLast(10086)
-L2.addLast(10086)
+L2.addLast(1)
 print(L2)
 print(L2.size())
+
+class DLList:
+    class __IntNode:
+        def __init__(self, i: int, prev=None, next=None):
+            self.item = i
+            self.prev = prev
+            self.next = next
         
+        def __repr__(self):
+            return f"({self.item})" if self.next is not None else f"({self.item})"
+    
+    def __init__(self):
+        self.__sentinel = self.__IntNode(0) 
+        self.__sentinel.prev = self.__sentinel
+        self.__sentinel.next = self.__sentinel
+        self.__size = 0
+    
+    def addFirst(self, x: int):
+        new_node = self.__IntNode(x, self.__sentinel, self.__sentinel.next)
+        self.__sentinel.next.prev = new_node
+        self.__sentinel.next = new_node
+        self.__size += 1
+    
+    def getFirst(self) -> int:
+        if self.__sentinel.next == self.__sentinel:
+            raise IndexError("List is empty")
+        return self.__sentinel.next.item
+    
+    def addLast(self, x: int):
+        new_node = self.__IntNode(x, self.__sentinel.prev, self.__sentinel)
+        self.__sentinel.prev.next = new_node
+        self.__sentinel.prev = new_node
+        self.__size += 1
+    
+    def __repr__(self):
+        elements = []
+        current = self.__sentinel.next
+        while current != self.__sentinel:
+            elements.append(str(current.item))
+            current = current.next
+        return f"[{', '.join(elements)}]"
+    
+A = DLList()
+A.addFirst(1)
+A.addFirst(2)
+A.addLast(10)
+A.addFirst(3)
+A.addFirst(4)
+A.addLast(9)
+print(A, A.getFirst())
