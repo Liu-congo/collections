@@ -242,13 +242,13 @@ print(L2.size())
 
 class DLList:
     class __IntNode:
-        def __init__(self, i: int, prev=None, next=None):
+        def __init__(self, i, prev=None, next=None):
             self.item = i
             self.prev = prev
             self.next = next
         
         def __repr__(self):
-            return f"({self.item})" if self.next is not None else f"({self.item})"
+            return f"({self.item})" 
     
     def __init__(self):
         self.__sentinel = self.__IntNode(0) 
@@ -256,22 +256,84 @@ class DLList:
         self.__sentinel.next = self.__sentinel
         self.__size = 0
     
-    def addFirst(self, x: int):
+    def addFirst(self, x):
         new_node = self.__IntNode(x, self.__sentinel, self.__sentinel.next)
         self.__sentinel.next.prev = new_node
         self.__sentinel.next = new_node
         self.__size += 1
-    
-    def getFirst(self) -> int:
-        if self.__sentinel.next == self.__sentinel:
-            raise IndexError("List is empty")
-        return self.__sentinel.next.item
-    
-    def addLast(self, x: int):
+
+    def addLast(self, x):
         new_node = self.__IntNode(x, self.__sentinel.prev, self.__sentinel)
         self.__sentinel.prev.next = new_node
         self.__sentinel.prev = new_node
         self.__size += 1
+    
+    def isEmpty(self) -> bool:
+        return True if self.__sentinel.next == self.__sentinel else False
+
+    def size(self) -> int:
+        return self.__size
+
+    def removeFirst(self):
+        if self.isEmpty():
+            return None
+        remove_node = self.__sentinel.next
+        self.__sentinel.next.next.prev = self.__sentinel
+        self.__sentinel.next = self.__sentinel.next.next
+        self.__size -= 1
+        return remove_node.item
+
+    def removeLast(self):
+        if self.isEmpty():
+            return None
+        remove_node = self.__sentinel.prev
+        self.__sentinel.prev.prev.next = self.__sentinel
+        self.__sentinel.prev = self.__sentinel.prev.prev
+        self.__size -= 1
+        return remove_node.item
+    
+    def get(self, n:int):
+        if n < -self.__size or n > self.__size - 1:
+            raise IndexError("DLList index out of range")
+        cnt = 0
+        if n >= 0:
+            tmp = self.__sentinel.next
+            while cnt != n:
+                tmp = tmp.next
+                cnt += 1
+            return tmp.item
+        else:
+            tmp = self.__sentinel
+            while cnt != n:
+                tmp = tmp.prev
+                cnt -= 1
+            return tmp.item
+
+    def getRecursive(self, n:int):
+        # only support situation that index >= 0
+        if n < -self.__size or n > self.__size - 1:
+            raise IndexError("DLList index out of range")
+        if n == 0:
+            return self.__sentinel.next.item
+        if n == -1:
+            return self.__sentinel.prev.item
+        elif n > 0:
+            tmp = self.removeFirst()
+            out = self.getRecursive(n-1)
+            self.addFirst(tmp)
+            return out
+        else:
+            tmp = self.removeLast()
+            out = self.getRecursive(n+1)
+            self.addLast(tmp)
+            return out
+
+    @staticmethod
+    def copy(dllist=None):
+        new_dllist = DLList()
+        for i in range(dllist.size()):
+            new_dllist.addLast(dllist.get(i))
+        return new_dllist
     
     def __repr__(self):
         elements = []
@@ -284,8 +346,18 @@ class DLList:
 A = DLList()
 A.addFirst(1)
 A.addFirst(2)
-A.addLast(10)
-A.addFirst(3)
-A.addFirst(4)
 A.addLast(9)
-print(A, A.getFirst())
+print(A)
+k = A.removeFirst()
+print(A, k)
+k = A.removeLast()
+print(A, k)
+A.addFirst(2)
+A.addLast(9)
+A.addFirst(2)
+A.addLast(9)
+print(A, A.get(0), A.get(3), A.get(4))
+B = DLList.copy(A)
+A.addLast(10086)
+k = A.getRecursive(-6)
+print(A, B, k)
