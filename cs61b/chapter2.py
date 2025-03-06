@@ -424,11 +424,11 @@ print(A, A.size(), k)
 import time
 st = time.time()
 A = AList()
-for i in range(10000000):
+for i in range(100):
     A.addLast(i)
-for i in range(10000000):
+for i in range(1000):
     A.addLast(A.get(i))
-for i in range(9000000):
+for i in range(900):
     A.removeLast()
 print(time.time() - st)
 # import time
@@ -441,3 +441,84 @@ print(time.time() - st)
 # for i in range(10000):
 #     A.removeLast()
 # print(time.time() - st)
+
+
+# Discussion 3 More Practice with Linked List
+class SLList:
+    class __IntNode:
+        def __init__(self, item:int, next=None):
+            self.item = item
+            self.next = next
+        
+        def size(self):
+            if self.next == None:
+                return 1
+            else:
+                return 1 + self.next.size()
+
+        def __repr__(self):
+            return f"{self.item}, {self.next}" if self.next != None else f"{self.item}"
+        
+    def __init__(self):
+        self.__first = self.__IntNode(0, None)
+
+    def addFirst(self, x:int):
+        self.__first.next = self.__IntNode(x, self.__first.next)
+    
+    def insert(self, item:int, position:int):
+        tmp = self.__first
+        while (position > 0) and (tmp.next != None):
+            position -= 1
+            tmp = tmp.next
+        adding_node = self.__IntNode(item, None)
+        if tmp.next == None:
+            tmp.next = adding_node
+        else:
+            adding_node.next = tmp.next
+            tmp.next = adding_node
+        return
+    def reverse(self):
+        cursor1 = self.__first.next
+        if cursor1.next == None:
+            return
+        cursor2 = cursor1.next
+        cursor1.next = None
+        while cursor2 != None:
+            tmp = cursor2.next
+            cursor2.next = cursor1
+            cursor1 = cursor2
+            cursor2 = tmp
+        self.__first.next = cursor1
+        return
+    
+    def reverseRecursive(self):
+        cursor1 = self.__first
+        cursor2 = self.__first.next
+        while cursor2.next != None:
+            cursor1 = cursor1.next
+            cursor2 = cursor2.next
+
+        if self.__first.next.size() == 1:
+            cursor2.next = None
+            return
+        else:
+            cursor2.next = cursor1
+            cursor1.next = None
+            self.reverseRecursive()
+            self.__first.next = cursor2
+        return
+
+    def __repr__(self):
+        return f"[{self.__first.next}]"
+A = SLList()
+A.addFirst(10086)
+A.addFirst(310018)
+for i in range(5):
+    A.insert(i, i+100)
+print(A)
+A.reverse()
+print(A)
+A.reverseRecursive()
+for i in range(5):
+    A.insert(i, i+100)
+print(A)
