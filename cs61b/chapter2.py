@@ -215,6 +215,16 @@ class SLList:
         # self.__last = self.__last.next
         self.__size += 1
 
+    def get(self, idx: int):
+        if self.__size < 1:
+            return None
+        if idx > self.__size - 1:
+            raise IndexError('Index out of range')
+        tmp = self.__first.next
+        while idx > 0:
+            tmp = tmp.next
+            idx -= 1
+        return tmp.item
     
     def size(self):
         return self.__size
@@ -361,3 +371,73 @@ B = DLList.copy(A)
 A.addLast(10086)
 k = A.getRecursive(-6)
 print(A, B, k)
+
+import array as arr
+# Alist only supports integer as it's elements
+class AList:
+    def __init__(self):
+        self.__items = arr.array('i',[0]*128)
+        self.__size = 0
+        self.usage_ratio = 0.25
+        pass
+
+    def addLast(self, x:int):
+        if self.__size == self.__items.buffer_info()[1]:
+            new_items = arr.array('i',[0]*(self.__size*2))
+            new_items[:self.__size] = self.__items[:self.__size]
+            self.__items = new_items
+        self.__items[self.__size] = x
+        self.__size += 1
+        return
+
+    def getLast(self) -> int:
+        return self.__items[self.__size - 1]
+
+    def get(self, idx: int) -> int:
+        return self.__items[idx]
+
+    def size(self) -> int:
+        return self.__size
+
+    def removeLast(self) -> int:
+        out = self.getLast()
+        self.__size -= 1
+        if self.__size < self.usage_ratio * self.__items.buffer_info()[1]:
+            new_items = arr.array('i',[0]*int(self.__items.buffer_info()[1]/2))
+            new_items[:self.__size] = self.__items[:self.__size]
+            self.__items = new_items
+        return out
+    
+    def __repr__(self):
+        return str(self.__items[:self.__size])
+    
+A = AList()
+print(A.size())
+A.addLast(10086)
+print(A.getLast())
+A.addLast(99)
+print(A.getLast(), A.get(0), A.get(1))
+A.addLast(36)
+print(A.get(2))
+k = A.removeLast()
+print(A, A.size(), k)
+import time
+st = time.time()
+A = AList()
+for i in range(10000000):
+    A.addLast(i)
+for i in range(10000000):
+    A.addLast(A.get(i))
+for i in range(9000000):
+    A.removeLast()
+print(time.time() - st)
+# import time
+# st = time.time()
+# A = DLList()
+# for i in range(10000):
+#     A.addLast(i)
+# for i in range(10000):
+#     A.addLast(A.get(i))
+# for i in range(10000):
+#     A.removeLast()
+# print(time.time() - st)
