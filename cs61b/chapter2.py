@@ -522,3 +522,47 @@ A.reverseRecursive()
 for i in range(5):
     A.insert(i, i+100)
 print(A)
+
+# Discussion3 Arrays
+import array as arr
+x = arr.array('i',[5,9,14,15])
+def insert(cur_array:arr.array, item:int, position:int):
+    cur_array_size = cur_array.buffer_info()[1]
+    output_array = arr.array('i', [0]*(cur_array_size + 1))
+    if position > cur_array_size:
+        output_array[:cur_array_size] = cur_array
+        output_array[-1] = item
+    else:
+        output_array[:position] = cur_array[:position]
+        output_array[position] = item
+        output_array[position+1:] = cur_array[position:]
+    return output_array
+y = insert(x, 6, 10086)
+print(x, y)
+
+def reverse(cur_array:arr.array):
+    cur_array_size = cur_array.buffer_info()[1]
+    output_array = arr.array('i', [0]*(cur_array_size))
+    for i in range(cur_array_size):
+        output_array[i] = cur_array[cur_array_size-1-i]
+    return output_array
+z = reverse(y)
+print(z)
+
+def replicate(cur_array:arr.array):
+    cur_array_size = cur_array.buffer_info()[1]
+    cur_value = cur_array[0]
+    extra_e = 0
+    for i in range(cur_array_size):
+        adding_times = cur_array[i + extra_e] - 1
+        for _ in range(adding_times):
+            cur_array.insert(i + extra_e + 1, cur_value)
+            extra_e += 1
+        if i != cur_array_size - 1:
+            cur_value = cur_array[i + extra_e + 1]
+x = arr.array('i',[3,2,1,2,3])
+print(x)
+replicate(x)
+print(x)
+        
+
