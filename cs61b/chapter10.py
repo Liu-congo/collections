@@ -66,82 +66,125 @@ class BST:
             return t
     
 # full version
-class BST_full:
-    class __Node:
-        def __init__(self, key, val, size):
-            self.key = key
-            self.val = val
-            self.size = size
-            self.left, self.right = None, None
+from queue import Queue
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
 
+class BST_full:
     def __init__(self):
         self.__root = None
 
-    def isEmpty(self) -> bool:
-        return self.size() == 0
+    def insert(self, value):
+        self.__root = self.__insert_recursive(self.__root, value)
     
-    def size(self) -> int:
-        return self.__size(self.root)
-
-    def __size(self, x: __Node) -> int:
-        if x == None:
-            return 0
+    def __insert_recursive(self, node: Node, value):
+        if node == None:
+            return Node(value)
+        if value < node.value:
+            node.left = self.__insert_recursive(node.left, value)
+        elif value > node.value:
+            node.right = self.__insert_recursive(node.right, value)
         else:
-            return x.size
-
-    def contains(self, key) -> bool:
-        if key == None:
-            raise Exception("argument to contains is None")
-        return self.get(key) != None
+            print(f"{value} already exists")
+            return node
+        return node
     
-    def get(self, key):
-        return self.__get(self.__root, key)
-
-    def __get(self, x: __Node, key):
-        if key == None:
-            raise Exception("calls get with a None key")
-        if x == None:
+    def delete(self, value):
+        self.__root = self.__delete_recursive(self.__root, value)
+    
+    def __delete_recursive(self, node: Node, value):
+        if node == None:
             return None
-        if key < x.key:
-            return self.__get(x.left, key)
-        elif key > x.key:
-            return self.__get(x.right, key)
+        if value < node.value:
+            node.left = self.__delete_recursive(node.left, value)
+        elif value > node.value:
+            node.right = self.__delete_recursive(node.right, value)
         else:
-            return x.val
+            if node.left == None:
+                return node.right
+            elif node.right == None:
+                return node.left
+            else:
+                min_node = self.__find_min(node.right)
+                node.value = min_node.value
+                node.right = self.__delete_recursive(node.right, min_node.value)
+        return node
+    
+    def __find_min(self, node: Node) -> Node:
+        current = node
+        while current.left:
+            current = current.left
+        return current
+    
+    def contains(self, value) -> bool:
+        return self.__contains_recursive(self.__root, value)
+    
+    def __contains_recursive(self, node: Node, value) -> bool:
+        if node == None:
+            return False
+        if value == node.value:
+            return True
+        if value < node.value:
+            return self.__contains_recursive(node.left, value)
+        else:
+            return self.__contains_recursive(node.right, value)
         
-    def put(self, key, val):
-        if key == None:
-            raise Exception("call put with None key")
-        if val == None:
-            self.delete(key)
-            return
-        self.__root = self.__put(self.root, key, val)
-
-    def __put(self, x: __Node, key, val):
-        if x == None:
-            return self.__Node(key, val, 1)
-        if key < x.key:
-            x.left = self.__put(x.left, key, val)
-        elif key > x.key:
-            x.right = self.__put(x.right, key, val)
-        else:
-            x.val = val
-        x.size = 1 + self.__size(x.left) + self.__get(x.right)
-        return x
+    def inorder_traversal(self):
+        result = []
+        self.__inorder_traversal(self.__root, result)
+        return result
     
-    def deleteMin(self):
-        if self.isEmpty():
-            raise Exception("BST underflow")
-        self.__root = self.__deleteMin(self.__root)
+    def __inorder_traversal(self, node: Node, result: list):
+        if node:
+            self.__inorder_traversal(node.left, result)
+            result.append(node.value)
+            self.__inorder_traversal(node.right, result)
     
-    def __deleteMin(self, x: __Node):
-        if x.left == None:
-            return x.right
-        x.left = self.__deleteMin(x.left)
-        x.size = 1 + self.__size(x.left) + self.__get(x.right)
-        return x
+    def level_order_traversal(self):
+        result = []
+        if not self.__root:
+            return result
+        queue = Queue()
+        queue.put(self.__root)
+        while not queue.empty():
+            node = queue.get()
+            result.append(node.value)
+            if node.left:
+                queue.put(node.left)
+            if node.right:
+                queue.put(node.right)
+        return result
     
-    def deleteMax(self):
+    def min_value(self):
+        if not self.__root:
+            raise Exception("BST is empty")
+        current = self.__root
+        while current.left:
+            current = current.left
+        return current.value
+    
+    def is_empty(self):
+        return self.__root == None
+    
+bst = BST_full()
+bst.insert(5)
+bst.insert(3)
+bst.insert(8)
+bst.insert(1)
+bst.insert(4) 
+print(bst.level_order_traversal())  
+print(bst.inorder_traversal()) 
+bst.delete(4)
+print(bst.inorder_traversal()) 
+bst.delete(5)
+print(bst.inorder_traversal()) 
+print(bst.contains(3))      
+print(bst.contains(10))    
+print(bst.min_value())           
+print(bst.level_order_traversal())  
         
     
         
