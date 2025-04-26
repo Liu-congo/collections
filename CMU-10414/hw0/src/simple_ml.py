@@ -118,7 +118,21 @@ def softmax_regression_epoch(X, y, theta, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    num_examples, input_dim = X.shape
+    num_classes = theta.shape[1]
+    X_Batch = X.reshape(-1, batch, input_dim)
+    y_Batch = np.zeros((num_examples, num_classes))
+    y_Batch[range(num_examples), y] = 1
+    y_Batch = y_Batch.reshape(-1, batch, num_classes)
+
+    for batch_idx, x_batch in enumerate(X_Batch):
+        h_batch = x_batch @ theta
+        z_batch = np.exp(h_batch)
+        normalizer = np.sum(z_batch, axis=1).reshape(-1, 1)
+        z_batch = z_batch / normalizer
+        grad = (1/batch)*x_batch.T@(z_batch - y_Batch[batch_idx])
+        theta -= grad * lr
+    return
     ### END YOUR CODE
 
 
@@ -145,7 +159,27 @@ def nn_epoch(X, y, W1, W2, lr = 0.1, batch=100):
         None
     """
     ### BEGIN YOUR CODE
-    pass
+    num_examples, input_dim = X.shape
+    hidden_dim, num_classes = W2.shape
+    X_Batch = X.reshape(-1, batch, input_dim)
+    y_Batch = np.zeros((num_examples, num_classes))
+    y_Batch[range(num_examples), y] = 1
+    y_Batch = y_Batch.reshape(-1, batch, num_classes)
+
+    for batch_idx in range(X_Batch.shape[0]):
+        x_batch = X_Batch[batch_idx]
+        y_batch = y_Batch[batch_idx]
+        z_batch = x_batch @ W1
+        z_batch[z_batch < 0.] = 0.
+        g2_batch = np.exp(z_batch@W2)
+        normalizer = np.sum(g2_batch, axis=1).reshape(-1, 1)
+        g2_batch = g2_batch / normalizer - y_batch
+        g1_batch = np.where(z_batch>0, 1, 0) * (g2_batch @ W2.T)
+        gradient_w1 = (1/batch)*x_batch.T@g1_batch
+        gradient_w2 = (1/batch)*z_batch.T@g2_batch
+        W1 -= lr * gradient_w1
+        W2 -= lr * gradient_w2
+    return
     ### END YOUR CODE
 
 
